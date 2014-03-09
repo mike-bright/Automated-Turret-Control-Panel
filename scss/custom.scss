@@ -5,6 +5,15 @@ $red: #EB3A3A;
 $bootstrapblue: #428bca;
 $lightgrey: #A3A3A3;
 
+html {
+  width: auto !important;
+  overflow-x: hidden !important;
+}
+body {
+  width: auto !important;
+  overflow-x: hidden !important;
+}
+
 //General classes/ids etc.
 [viewData] {
   cursor: pointer;
@@ -35,6 +44,10 @@ dt[id$="-label"]{
 
 .spacer {
   height: 20px;
+}
+
+.spinner {
+  margin-top: 30%;
 }
 
 ////////////////
@@ -83,22 +96,29 @@ dt[id$="-label"]{
 }
 //////end of sidebar//////
 
-////login modal/////
-.modal {
-  .modal-header  {
-  border-bottom: none;
-  position: relative;
+#settingsModal{
+
+  .modal-body {
+    overflow: hidden;
   }
-  .modal-header .btn {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin-top: 0;
-    border-top-left-radius: 0;
-    border-bottom-right-radius: 0;
+  .form-group {
+    height: 60px;
+    width: 48%;
+    margin: 1%;
+    float: left;
+
+    .bootstrap-select {
+      display: block;
+      width: 100%;
+    }
+  }
+  .checkboxGroup {
+    height: 60px;
+  }
+  .checkboxLabel {
+    width: 78%; //matches up with right edge of inputs
   }
 }
-////end of login modal/////
 
 .alert{
   position: fixed;
@@ -159,7 +179,6 @@ table.infraredArray {
   height:50px;
   border-spacing:5px;
   border-radius: 25px;
-  border: 1px solid $lightgrey;
   }
 }
 

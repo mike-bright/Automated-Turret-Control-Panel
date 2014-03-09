@@ -1,60 +1,34 @@
+////global vars/////
+var stateObject,
+	lastPage = null,
+	spinner = "<img src='images/spiffygif.com.gif' class='center-block spinner' alt='Spinner'>";
 
 $(document).ready(function() {
-	if(typeof notifications !== "undefined")
-		setupNotifications();
-
-	showSettings($('.settingsContainer'));
-	showSettingsForm($('#settingsForm'));
-
-	$('[viewData]').click(function() {
-		window.location.href = $(this).attr('viewData');
+	switch(currentPage){
+		case "Index":
+			indexInit();
+		break;
+		case "Debug":
+			debugInit();
+		break;
+	}
+	$('.debugTrigger').click(function(e) {
+		if(ajax){
+			e.preventDefault();
+			showDebug();
+		}
+		$(this).parent().addClass('active');
 	});
 
-	$('table.infraredArray tr td').each(function() {
-		var magnitude = Math.round(255-($(this).attr('magnitude')*255));
-		$(this).css('background-color', 'rgb(255, '+magnitude+', '+magnitude+')');
+	$('.homeTrigger').click(function(e) {
+		if(ajax){
+			e.preventDefault();
+			showIndex();
+		}
 	});
-	$('#startSweep').click(function() {
-		sweepDemo();
-	});
-	$('#settingsModal').on('hide.bs.modal', function() {
-		$('#settingsButton').removeClass('active');
-	});
-	$('#settingsModal').on('show.bs.modal', function() {
-		$('#settingsButton').addClass('active');
-	});
-	testArray = ['.05', '.1', '.1', '.1', '.2', '.2', '.1', '.1'];
-	testArray2 = ['.2', '.25', '.5', '.7', '.9', '.8', '.5', '.3'];
-	updateInfrared(testArray);
 });
 
-// constants
-var spinner = "<img src='images/spiffygif.com.gif' class='center-block' alt='Spinner'>";
-////////////
-function setupNotifications(){
-	var next = getNotification(notifications);
-	if(next){
-		$('body').append('<div alert class="alert alert-info alert-dismissable fade in">\
-			<a href="#" id="currNotification" class="close" data-dismiss="alert">&times;</a>\
-			<span>'+next+'</span></div>');
-		//note: find a better way to do the delay
-		setTimeout(function(){
-			$('#currNotification').trigger('click');
-		}, 5000);
-		setTimeout(function(){
-			setupNotifications();
-		}, 6000);
-	}
-}
-
-function getNotification(notificationArray){
-	var current = notificationArray.pop();
-	if(typeof current !== undefined)
-		return current;
-	else
-		return false;
-}
-
+///////jquery method for progress bars//////
 (function( $ ){
 
     var methods = {
@@ -104,6 +78,8 @@ function getNotification(notificationArray){
 
 })(jQuery);
 
+//////shared functions///////
+
 function sweepDemo() {
 	var $magazine = $('#magazineProgress');
 	var $scanning = $('#scanningProgress');
@@ -116,7 +92,7 @@ function sweepDemo() {
 	      $scanning.progressBar('update', 10*i);
 	      if(i === 6){
 			updateInfrared(testArray2);
-	      	shootLoop(12);
+	      	shootLoop($magazine.prop('aria-valuenow'));
 	      }
 	      i++;
 	      if (i<7) sweepLoop(i);
@@ -152,8 +128,9 @@ function updateInfrared(sensorData) {
 function updateSettings(){
 	var $form = $('#settingsForm');
 	var $formData = $form.serialize();
-	console.log($formData);
+	sweepRange = $('#sweepRange').val();
 	$.post($form.attr('action'), $formData, function(data) {
+		eval('show'+currentPage)();
 		$('#settingsModal').find('[data-dismiss="modal"]').trigger('click');	//close modal
 		showSettings($('.settingsContainer'));	//update settings display
 		showSettingsForm($('#settingsForm'));	//update form data
@@ -161,6 +138,7 @@ function updateSettings(){
 
 }
 
+//shows settings on index
 function showSettings($container){
 	$container.empty();
 	$container.html(spinner);
@@ -171,6 +149,7 @@ function showSettings($container){
 	});
 }
 
+//generates hidden settings modal
 function showSettingsForm($container){
 	$container.empty();
 	$container.html(spinner);
@@ -178,6 +157,125 @@ function showSettingsForm($container){
 	$.post('/settings/form', null, function(data) {
 		$container.empty();
 		$container.html(data);
-		$('input[type="checkbox"]').parent().addClass('half');
+		var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+		elems.forEach(function(html) {
+			var switchery = new Switchery(html);
+		});
+		$('.selectpicker').selectpicker();
 	});
+
+}
+
+////////index functions/////////
+var showIndex = function(){
+	var $mainContent = $('#mainContent');
+	$mainContent.empty();
+	$mainContent.html(spinner);
+	$.post('/', function(data){
+		$mainContent.empty();
+		$mainContent.html(data);
+		history.pushState(stateObject, "Automated Turret", '/');
+		lastPage = currentPage;
+		currentPage = "Index";
+		indexInit();
+	});
+}
+
+var indexInit = function() {
+	showSettings($('.settingsContainer'));
+	showSettingsForm($('#settingsForm'));
+	$('.debugTrigger').parent().removeClass('active');
+
+	$('[viewData]').click(function() {
+		window.location.href = $(this).attr('viewData');
+	});
+
+	$('table.infraredArray tr td').each(function() {
+		var magnitude = Math.round(255-($(this).attr('magnitude')*255));
+		$(this).css('background-color', 'rgb(255, '+magnitude+', '+magnitude+')');
+	});
+	$('#startSweep').click(function() {
+		sweepDemo();
+	});
+	$('#settingsModal').on('hide.bs.modal', function() {
+		$('[data-toggle="modal"]').parent().removeClass('active');
+	});
+	$('#settingsModal').on('show.bs.modal', function() {
+		$('[data-toggle="modal"]').parent().addClass('active');
+	});
+	testArray = ['.05', '.1', '.1', '.1', '.2', '.2', '.1', '.1'];
+	testArray2 = ['.2', '.25', '.5', '.7', '.9', '.8', '.5', '.3'];
+	updateInfrared(testArray);
+
+	new Switchery($('.js-switch'));
+};
+
+/////////////debug functions////////////////////
+var showDebug = function() {
+	var $mainContent = $('#mainContent');
+	$mainContent.empty();
+	$mainContent.html(spinner);
+	$.post('/debug', function(data){
+		$mainContent.empty();
+		$mainContent.html(data);
+		history.pushState(stateObject, "Automated Turret - Debug", '/debug');
+		lastPage = currentPage;
+		currentPage = "Debug";
+		debugInit();
+	});
+}
+
+var debugInit = function() {
+	showSettings($('.settingsContainer'));
+	showSettingsForm($('#settingsForm'));
+	$('.debugTrigger').parent().addClass('active');
+
+	$('#settingsModal').on('hide.bs.modal', function() {
+		$('#settingsButton').removeClass('active');
+	});
+	$('#settingsModal').on('show.bs.modal', function() {
+		$('#settingsButton').addClass('active');
+	});
+	new Switchery($('.js-switch'));
+
+	$('.dial').knob({
+		'min': 0,
+		'max': sweepRange,
+		'angleArc': sweepRange,
+		'angleOffset': 270,
+		'fgColor': "#69bd7d",
+		'draw' : function() {
+			$(this.i).val(this.cv + '°');
+	  	},
+	  	'release' : function(v) {
+	  		updateServo(v);
+	  	}
+	});
+
+	$('#shoot').click(function(){
+		$('#magazineProgress').progressBar('decrement');
+		addToLog("shot fired");
+	});
+	$('#refresh').click(function(){
+		$('#magazineProgress').progressBar('max');
+		addToLog("refreshing status");
+		addToLog("ammo at max");
+	});
+	$('#settingsModal').on('hide.bs.modal', function() {
+		$('[data-toggle="modal"]').parent().removeClass('active');
+	});
+	$('#settingsModal').on('show.bs.modal', function() {
+		$('[data-toggle="modal"]').parent().addClass('active');
+	});
+
+	function addToLog(message) {
+		var $logContainer = $('div.logPanel .panel-body');
+		var height = $logContainer.prop('scrollHeight');
+		$logContainer.append('<br>'+message);
+		$logContainer.animate({scrollTop: height}, 100);
+	}
+
+	function updateServo(angle) {
+		addToLog("servo updated to "+angle+" degrees");
+	}
 }

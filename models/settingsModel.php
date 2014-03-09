@@ -15,13 +15,16 @@ class settingsModel {
 		$mode = (int)$settings['mode'];
 		$magazineSize = (int)$settings['magazineSize'];
 		$sweepRange = (int)$settings['sweepRange'];
-
+		$autoBurst = (int)$settings['autoBurst'];
+		$manualBurst = (int)$settings['manualBurst'];
+		$pusherSetPoint = (int)$settings['pusherSetPoint'];
 		$motionDetection = (array_key_exists('motionDetection', $settings)) ? 1 : 0;
 		$alarm = (array_key_exists('alarm', $settings)) ? 1 : 0;
 
 		$query = "REPLACE INTO settings
-						   (id, mode, magazineSize, sweepRange, motionDetection, alarm)
-					VALUES (1, $mode, $magazineSize, $sweepRange, $motionDetection, $alarm)";
+						   (id, mode, magazineSize, sweepRange, motionDetection, alarm, manualBurst, autoBurst, pusherSetPoint)
+					VALUES (1, $mode, $magazineSize, $sweepRange, $motionDetection, $alarm, $manualBurst, $autoBurst, $pusherSetPoint)";
+					echo $query;
 		$db->query($query);
 		//send settings to device
 	}

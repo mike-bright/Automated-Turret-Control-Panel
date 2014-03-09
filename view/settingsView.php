@@ -25,6 +25,9 @@ class settingsView {
 		'sweepRange' => 'number',
 		'motionDetection' => 'checkbox',
 		'alarm' => 'checkbox',
+		'autoBurst' => 'number',
+		'manualBurst' => 'number',
+		'pusherSetPoint' => 'number'
 		);
 
 	public function settingsDisplay($allSettings) {
@@ -42,19 +45,28 @@ class settingsView {
 	}
 
 	public function settingsForm($allSettings) {
-
+		$checkboxes = "";
 		foreach($allSettings as $name => $value){
 			if(array_key_exists($name, $this->formMappings)){
+				$capName = ucwords($name);
+
 				switch ($this->formMappings[$name]) {
 					case 'number':
-						$input = "<input id='$name' name='$name' class='form-control' type='number' value='$value'>";
+						echo "<div class='form-group'>
+							  <label class='control-label'>$capName:</label>
+							  <input id='$name' name='$name' class='form-control' type='number' value='$value'>
+							  </div>";
 						break;
 					case 'checkbox':
-                  		$input = "<input id='$name' name='$name' class='form-control' type='checkbox'";
-                  		$input .= ($value===1) ? "checked>" : ">";
+                  		$checkboxes .= "<div class='form-group checkboxGroup'>
+                  							<label class='control-label checkboxLabel'>$capName: </label>
+          					       			<input id='$name' name='$name' class='js-switch' type='checkbox'";
+                  		$checkboxes .= ($value===1) ? "checked>" : ">";
+                  		$checkboxes .= "</div>";
 						break;
 					case 'select':
-						$input = "<select id='$name' name='$name' class='form-control'>";
+						$input = "<div class='form-group'><label class='control-label'>$capName:</label>
+								  <select id='$name' name='$name' class='selectpicker show-tick'>";
 						if(array_key_exists($name, $this->numericConversions)){
 							foreach ($this->numericConversions[$name] as $optionNumber => $optionName) {
 								$input .= "<option value='$optionNumber' ";
@@ -62,19 +74,14 @@ class settingsView {
 								$input .= "$optionName</option>";
 							}
 						}
-
-						$input .= "</select>";
+						$input .= "</select></div>";
+						echo $input;
 						break;
 					default:
 						break;
 				}
-				$capName = ucwords($name);
-             	echo "<div class='form-group list-group-item'>
-						<label for='$name'>$capName:</label> 
-						$input
-					</div>
-             	";
-	      }
+	      	}
 		}
+		echo $checkboxes;
 	}
 }
