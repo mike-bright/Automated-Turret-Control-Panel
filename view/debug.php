@@ -17,9 +17,6 @@
 </div>
 <?php require_once('settingsModal.php'); ?>
 </body>
-<script src="/components/sass-bootstrap/dist/js/bootstrap.js"></script>
-<script src="/js/jquery.knob.js"></script>
-<script src="/js/app.js"></script>
-<script src="/js/switchery.js"></script>
-<script src="/js/bootstrap-select.js"></script>
+<?php require_once('js.php'); ?>
+<script data-no-instant>InstantClick.init();</script>
 </html>
