@@ -26,6 +26,7 @@ $(document).ready(function() {
 			showIndex();
 		}
 	});
+	InstantClick.init();
 });
 
 ///////jquery method for progress bars//////

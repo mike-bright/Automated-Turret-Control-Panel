@@ -5031,6 +5031,9 @@ body {
   width: auto !important;
   overflow-x: hidden !important; }
 
+#instantclick-bar {
+  background: #69bd7d; }
+
 [viewData] {
   cursor: pointer; }
 

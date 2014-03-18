@@ -21,10 +21,6 @@
   </div>
 </div>
 </body>
-<?php require_once('settingsModal.php'); ?>
-<script src="/components/sass-bootstrap/dist/js/bootstrap.js"></script>
-<script src="/js/app.js"></script>
-<script src="/js/switchery.js"></script>
-<script src="/js/jquery.knob.js"></script>
-<script src="/js/bootstrap-select.js"></script>
+<?php require_once('settingsModal.php');
+      require_once('js.php'); ?>
 </html>
