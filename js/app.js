@@ -185,6 +185,7 @@ var showIndex = function(){
 var indexInit = function() {
 	showSettings($('.settingsContainer'));
 	showSettingsForm($('#settingsForm'));
+	$('.homeTrigger').parent().addClass('active');
 	$('.debugTrigger').parent().removeClass('active');
 
 	$('[viewData]').click(function() {
@@ -229,6 +230,7 @@ var showDebug = function() {
 var debugInit = function() {
 	showSettings($('.settingsContainer'));
 	showSettingsForm($('#settingsForm'));
+	$('.homeTrigger').parent().removeClass('active');
 	$('.debugTrigger').parent().addClass('active');
 
 	$('#settingsModal').on('hide.bs.modal', function() {
