@@ -166,21 +166,32 @@ function showSettingsForm($container){
 	});
 }
 
-//send message to hardware software on port 1337
+//send array to hardware software on port 1337
 //returns response
-function sendMessage($host, $message){
-	$.post('/socket', null, function(data) {
-		var xmlResponse = data.parseXML(data);
+function sendMessage(host, messageArray){
+	xmlString = arrayToXml(messageArray);
+	message['host'] = host;
+	message['message'] = xmlString;
+	$.post('/socket', message, function(data) {
+		var xmlResponse = $.parseXML(data);
 		return xmlToArray($xmlResponse);
 	});
 }
 
-function xmlToArray($xml){
+function xmlToArray(xml){
 	var arrayResponse = {};
-	$(xmlResponse).find("*").each(function(){
+	$(xml).find("*").each(function(){
 		arrayResponse[this.nodeName] = $(this).text;
 	});
 	return arrayResponse;
+}
+
+function arrayToXml(arrayXml){
+	var returnString = '<?xml version="1.0" encoding="UTF-8"?>';
+	arrayXml.forEach(function(element, index, array) {
+		returnString = returnString + "<" + index + ">" + element + "</" + index + ">";
+	});
+	return returnString;
 }
 
 ////////index functions/////////
