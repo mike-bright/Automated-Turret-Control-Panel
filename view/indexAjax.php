@@ -43,15 +43,15 @@
     <div class="panel panel-default">
       <div class="panel-heading">Controls</div>
       <div class="panel-body">
-        <button id="startSweep" class="btn btn-danger">Start Sweep</button>
-        <button href="#" id="stopSweep" class="btn btn-warning">Stop Sweep</button>
+        <button id="startSweep" class="btn btn-danger" data-no-instant>Start Sweep</button>
+        <button href="#" id="stopSweep" class="btn btn-warning" data-no-instant>Stop Sweep</button>
       </div>
     </div>
   </div>
   <div class="row">
     <div class="panel panel-default">
       <div class="panel-heading"><i class="glyphicon glyphicon-wrench"></i> Current Configuration
-        <span class="pull-right"><a href="#"  data-toggle="modal" data-target="#settingsModal" class="btn btn-default">Edit</a></span>
+        <span class="pull-right"><a href="#"  data-toggle="modal" data-target="#settingsModal" class="btn btn-default" data-no-instant>Edit</a></span>
       </div>
       <div class="list-group settingsContainer">
         <?php //settings echoed here by settingsview. ?>
