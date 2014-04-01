@@ -19,5 +19,6 @@ Toro::serve(array(
     "/settings/get" => "SettingsGetHandler",
     "/settings/form" => "SettingsFormHandler",
     "/debug" => "DebugHandler",
-    "/exec/:alpha" => "ExecHandler"
+    "/exec/:alpha" => "ExecHandler",
+    "/socket" => "SocketHandler"
 ));

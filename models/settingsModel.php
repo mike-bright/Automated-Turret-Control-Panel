@@ -1,7 +1,4 @@
 <?php
-function test(){
-
-}
 class settingsModel {
 
 	function __construct() {
@@ -48,4 +45,3 @@ class settingsModel {
 		return sqlite_fetch_single($result);
 	}
 }
-

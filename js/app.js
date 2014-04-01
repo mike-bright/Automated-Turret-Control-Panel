@@ -73,7 +73,7 @@ $(document).ready(function() {
             return methods.init.apply( this, arguments );
         } else {
             $.error( 'Method ' +  methodOrOptions + ' does not exist on jQuery.progressBar' );
-        }    
+        }
     }
 
 
@@ -88,7 +88,7 @@ function sweepDemo() {
 	$magazine.progressBar('max');
 	$scanning.progressBar('min');
 
-	(function sweepLoop(i) { 
+	(function sweepLoop(i) {
 	   setTimeout(function() {
 	      $scanning.progressBar('update', 10*i);
 	      if(i === 6){
@@ -164,7 +164,23 @@ function showSettingsForm($container){
 		});
 		$('.selectpicker').selectpicker();
 	});
+}
 
+//send message to hardware software on port 1337
+//returns response
+function sendMessage($host, $message){
+	$.post('/socket', null, function(data) {
+		var xmlResponse = data.parseXML(data);
+		return xmlToArray($xmlResponse);
+	});
+}
+
+function xmlToArray($xml){
+	var arrayResponse = {};
+	$(xmlResponse).find("*").each(function(){
+		arrayResponse[this.nodeName] = $(this).text;
+	});
+	return arrayResponse;
 }
 
 ////////index functions/////////
