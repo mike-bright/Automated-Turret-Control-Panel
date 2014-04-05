@@ -1,7 +1,4 @@
 .vagrant/
 *.scssc
 *.codekit
-
-.vagrant/machines/default/virtualbox/action_provision
-
-data/database.db
+*.db
