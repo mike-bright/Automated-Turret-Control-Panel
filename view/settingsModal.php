@@ -11,7 +11,7 @@
           <form action="/settings/update" id="settingsForm">
             <div href="" class="form-group list-group-item">
               <label for="mode">Mode:</label>
-              <select id="mode" name="mode" class="form-control">
+              <select id="mode" name="mode" class="form-control" data-no-instant>
                 <option value="nothing">Do nothing</option>
                 <option value="fire" selected>Fire at will</option>
                 <option value="alarm">Alarm</option>

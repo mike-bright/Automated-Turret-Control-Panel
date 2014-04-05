@@ -66,7 +66,7 @@ class settingsView {
 						break;
 					case 'select':
 						$input = "<div class='form-group'><label class='control-label'>$capName:</label>
-								  <select id='$name' name='$name' class='selectpicker show-tick'>";
+								  <select id='$name' name='$name' class='selectpicker show-tick' data-no-instant>";
 						if(array_key_exists($name, $this->numericConversions)){
 							foreach ($this->numericConversions[$name] as $optionNumber => $optionName) {
 								$input .= "<option value='$optionNumber' ";
