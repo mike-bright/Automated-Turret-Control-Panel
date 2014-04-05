@@ -168,30 +168,34 @@ function showSettingsForm($container){
 
 //send array to hardware software on port 1337
 //returns response
-function sendMessage(host, messageArray){
-	xmlString = arrayToXml(messageArray);
-	message['host'] = host;
-	message['message'] = xmlString;
+function sendMessage(host, message){
+	var xmlString = objectToXml(message);
+	var message = {'host':host, 'message':xmlString};
+	var response;
+	jQuery.isPlainObject(message);
 	$.post('/socket', message, function(data) {
-		var xmlResponse = $.parseXML(data);
-		return xmlToArray($xmlResponse);
+		setVars(xmlToObject(data));
 	});
 }
 
-function xmlToArray(xml){
+function xmlToObject(xml){
 	var arrayResponse = {};
 	$(xml).find("*").each(function(){
-		arrayResponse[this.nodeName] = $(this).text;
+		arrayResponse[$(this).context.localName] = $(this).text();
 	});
 	return arrayResponse;
 }
 
-function arrayToXml(arrayXml){
+function objectToXml(arrayXml){
 	var returnString = '<?xml version="1.0" encoding="UTF-8"?>';
-	arrayXml.forEach(function(element, index, array) {
-		returnString = returnString + "<" + index + ">" + element + "</" + index + ">";
-	});
+	for(var key in arrayXml){
+		returnString = returnString + "<" + key + ">" + arrayXml[key] + "</" + key + ">";
+	};
 	return returnString;
+}
+
+function setVars(varObject) {
+	console.log(varObject);
 }
 
 ////////index functions/////////
