@@ -2,3 +2,8 @@
 *.scssc
 *.codekit
 *.db
+*.sublime-project
+
+*.sublime-workspace
+
+.vagrant/machines/default/virtualbox/action_provision

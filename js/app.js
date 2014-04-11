@@ -144,7 +144,7 @@ function processSettings(){
 }
 
 function updateSettings(settingsArray){
-	$.post($form.attr('action'), settingsArray, function(data) {
+	$.post('/settings/update', settingsArray, function(data) {
 		eval('show'+currentPage)();
 		$('#settingsModal').find('[data-dismiss="modal"]').trigger('click');	//close modal
 		showSettings($('.settingsContainer'));	//update settings display
@@ -203,11 +203,12 @@ function xmlToObject(xml){
 }
 
 function objectToXml(arrayXml){
-	var returnString = '<?xml version="1.0" encoding="UTF-8"?>';
+	var returnString = '<?xml version="1.0" encoding="UTF-8"?>\
+						<turretSettings>';
 	for(var key in arrayXml){
 		returnString = returnString + "<" + key + ">" + arrayXml[key] + "</" + key + ">";
 	};
-	return returnString;
+	return returnString+'</turretSettings>';
 }
 
 function arrayToObject(arr) {
@@ -344,8 +345,8 @@ var debugInit = function() {
 	//knob settings/update function
 	$('.dial').knob({
 		'min': 0,
-		'max': sweepRange,
-		'angleArc': sweepRange,
+		'max': 180,
+		'angleArc': 180,
 		'angleOffset': 270,
 		'fgColor': "#69bd7d",
 		'draw' : function() {
