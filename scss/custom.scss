@@ -14,14 +14,6 @@ body {
   overflow-x: hidden !important;
 }
 
-.col-md-offset-1{
-  margin-left: 3%;
-}
-
-#instantclick-bar {
-  background: $logo;
-}
-
 //General classes/ids etc.
 [viewData] {
   cursor: pointer;
@@ -60,6 +52,9 @@ button {z-index:9999}
   margin-top: 30%;
 }
 
+.row{
+  padding: 0 5px 0 5px;
+}
 
 #autoToggle, #manualToggle{
   float: right;
@@ -149,10 +144,11 @@ table#infraredArray, table#motionArray {
   margin:0 auto;
 
   tbody tr td {
-  width:50px;
-  height:50px;
-  border-spacing:5px;
-  border-radius: 25px;
+    width:50px;
+    height:50px;
+    border-spacing:5px;
+    border-radius: 25px;
+    border: 1px solid $lightgrey;
   }
 }
 td#m1, td#m2 {

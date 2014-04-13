@@ -1,5 +1,5 @@
 ////global vars/////
-var defaultData = {"s1":"",
+var initialData = { "s1":"",
 					"s2":"",
 					"s3":"",
 					"s4":"",
@@ -8,24 +8,25 @@ var defaultData = {"s1":"",
 					"s7":"",
 					"s8":"",
 					"ammoCount":"",
-					"vmAutoDuty":"",
-					"vmManDuty":"",
-					"pmOutDutySP":"",
 					"psManPosDegrees":"",
-					"pirCurrentState":""
-					};
+					"pirCurrentState":"",
+					"vmAutoDuty":"60",
+					"vmManDuty":"",
+					"pmOutDutySP":"60",
+					"shotRequest":"0",
+				  };
 var spinner = "<img src='images/spiffygif.com.gif' class='center-block spinner' alt='Spinner'>",
 	host = '127.0.0.1',
 	poller,
 	mode,
 	firstUpdate = true,
 	turretConnection,
-	turretData = defaultData,
-	disconnects = 1;
+	turretData = initialData,
+	disconnects = 1,
+	autoburst = 1,
+	manualburst = 1;
 
-$(document).ready(function() {
-	indexInit();
-});
+$(document).ready(function(){indexInit()});
 
 function updateInfrared(sensorData) {
 	var output = "";
@@ -39,16 +40,16 @@ function updateInfrared(sensorData) {
 	$table.html(output);
 	$('table#infraredArray tr td').each(function() {
 		//calculate "intensity" of red for sensor
-		var magnitude = Math.round(255-(($(this).attr('magnitude')/50)*255));
+		var magnitude = Math.round(255-(($(this).attr('magnitude')-25)*255));
 		$(this).css('background-color', 'rgb(255, '+magnitude+', '+magnitude+')');
 	});
 }
 
 function updateMotion(sensorData) {
-	sensorData.each(function(key, value){
-		var color = (value)?'red':'#A3A3A3';
-		$('#s'+key).css('background-color');
-	});
+	for (var i = sensorData.length - 1; i >= 0; i--) {
+		var color = (sensorData[i])?'cornflowerblue':'#A3A3A3';
+		$('#m'+(i+1)).css('background-color', color);
+	};
 }
 
 function fetchSettings(){
@@ -61,85 +62,7 @@ function processSettings(){
 	sendMessage(arrayToObject(formData));	//send settings to hw
 }
 
-//send array to hardware software on port 1337
-//returns response
-function sendMessage(message, callback){
-	var xmlString = objectToXml(message);
-	var message = {'host':host, 'message':xmlString};
-	var response;
-	jQuery.isPlainObject(message);
-	$.post('/socket', message, function(data) {
-		if(data.length > 0 && data.indexOf("Warning") === -1){
-			disconnects = 0;
-			addToLog("Turret data updated");
-			// console.log(data);
-			setVars(xmlToObject(data));
-			return true;
-		} else {
-			disconnects++;
-			addToLog("<span style='color:red;'>Error</span> getting data!");
-			return false;
-		}
 
-		if(typeof callback !== "undefined")
-			callback();
-	});
-}
-
-function xmlToObject(xml){
-	var arrayResponse = {};
-	$(xml).find("*").each(function(){
-		arrayResponse[$(this).context.localName] = $(this).text();
-	});
-	return arrayResponse;
-}
-
-function objectToXml(arrayXml){
-	var returnString = '<?xml version="1.0" encoding="UTF-8"?>\
-						<turretSettings>';
-	for(var key in arrayXml){
-		returnString = returnString + "<" + key + ">" + arrayXml[key] + "</" + key + ">";
-	};
-	return returnString+'</turretSettings>';
-}
-
-function arrayToObject(arr) {
-  var rv = {};
-  for (var i = 0; i < arr.length; ++i)
-    if (arr[i] !== undefined) rv[i] = arr[i];
-  return rv;
-}
-
-function setVars(vars) {
-	// console.log(varObject);
-	//grab IR data
-	var sensorData = [vars['s1'],vars['s2'],vars['s3'],vars['s4'],
-					  vars['s5'],vars['s6'],vars['s7'],vars['s8'],];
-  	updateInfrared(sensorData);
-  	// updateMotion([vars['m1'], vars['m2']]);
-  	//update ammo count
-  	$('#magazineProgress').progressBar('update', vars['ammocount']);
-  	//update dials
-  	if(mode==="auto")
-  		$('.dialView').val(vars['psmanposdegrees']).trigger('change');
-  	if(vars['psmanposdegrees'] !== $('.dial').val().substr(0, $(this).length))
-		$('.dial').val(vars['psmanposdegrees']).trigger('change');
-	switch(vars['pircurrentstate']){
-		case 0:
-			updateMotion([0,0]);
-		break;
-		case 1:
-			updateMotion([1,0]);
-		break;
-		case 2:
-			updateMotion([0,1]);
-		break;
-		case 3:
-			updateMotion([1,1]);
-		break;
-	}
-
-}
 
 function startMonitoring(){
 	turretData['auto_man'] = 1;
@@ -206,7 +129,8 @@ var indexInit = function() {
 
 	//shoot button
 	$('#shoot').click(function(){
-		turretData['shotRequest'] = 1;
+		var count = (mode==="auto")?autoburst:manualburst;
+		turretData['shotRequest'] = count;
 		addToLog("Shot request sent");
 	});
 
@@ -215,6 +139,8 @@ var indexInit = function() {
 		$('#logPanel div.panel-body').slideToggle("fast");
 	});
 
+	$('.autoburst').val(autoburst);
+	$('.manualburst').val(manualburst);
 
 	connectToTurret();
 };
@@ -267,8 +193,8 @@ function connectToTurret() {
 		$connectingModal.modal();
 		//try to create connection every three seconds
 		setTimeout(function(){
-			sendMessage(defaultData, connectToTurret());
-		}, 3000);
+			sendMessage(initialData, connectToTurret);
+		}, 1000);
 	}else{
 		console.log("done waiting");
 		//connection made!
@@ -278,47 +204,116 @@ function connectToTurret() {
 	}
 }
 
-function pingTurret(imBack){
+function pingTurret(){
 	if(disconnects > 5){
 		//uh oh, display connecting to turret modal
 		connectToTurret();
 	} else if(typeof imBack === "undefined"){
 		setTimeout(function(){
-			sendMessage(turretData, pingTurret(true));
-		}, 1000);
+			sendMessage(turretData, pingTurret);
+		}, 200);
 	} else {
 		//reset data
-		turretData = defaultData;
+		
 		pingTurret();
 	}
 }
 
+//send array to hardware software on port 1337
+//returns response
+function sendMessage(message, callback){
+	var xmlString = objectToXml(message);
+	var message = {'host':host, 'message':xmlString};
+	var response;
+	jQuery.isPlainObject(message);
+	$.post('/socket', message, function(data) {
+		resetTurretData();
+		if(data.length > 0 && data.indexOf("Warning") === -1){
+			disconnects = 0;
+			addToLog("Turret data updated");
+			setVars(xmlToObject(data));
+			return true;
+		} else {
+			disconnects++;
+			addToLog("<span style='color:red;'>Error</span> getting data!");
+			return false;
+		}
+	});
+	callback();
+}
 
+function xmlToObject(xml){
+	var arrayResponse = {};
+	$(xml).find("*").each(function(){
+		arrayResponse[$(this).context.localName] = $(this).text();
+	});
+	return arrayResponse;
+}
 
-//////shared functions///////
-// function sweepDemo() {
-// 	var $magazine = $('#magazineProgress');
-// 	var $scanning = $('#scanningProgress');
-// 	updateInfrared(testArray);
-// 	$magazine.progressBar('max');
-// 	$scanning.progressBar('min');
+function objectToXml(arrayXml){
+	var returnString = '<?xml version="1.0" encoding="UTF-8"?>\
+						<turretSettings>';
+	for(var key in arrayXml){
+		returnString = returnString + "<" + key + ">" + arrayXml[key] + "</" + key + ">";
+	};
+	return returnString+'</turretSettings>';
+}
 
-// 	(function sweepLoop(i) {
-// 	   setTimeout(function() {
-// 	      $scanning.progressBar('update', 10*i);
-// 	      if(i === 6){
-// 			updateInfrared(testArray2);
-// 	      	shootLoop($magazine.prop('aria-valuenow'));
-// 	      }
-// 	      i++;
-// 	      if (i<7) sweepLoop(i);
-// 	   }, 1000)
-// 	})(1);
+function arrayToObject(arr) {
+  var rv = {};
+  for (var i = 0; i < arr.length; ++i)
+    if (arr[i] !== undefined) rv[i] = arr[i];
+  return rv;
+}
 
-// 	function shootLoop(i) {
-// 		setTimeout(function() {
-// 			$magazine.progressBar('update', i);
-// 			if((--i)+1) shootLoop(i);
-// 		}, 500);
-// 	}
-// }
+function setVars(vars) {
+	//grab IR data
+	var sensorData = [vars['s1'],vars['s2'],vars['s3'],vars['s4'],
+					  vars['s5'],vars['s6'],vars['s7'],vars['s8'],];
+  	updateInfrared(sensorData);
+  	// updateMotion([vars['m1'], vars['m2']]);
+  	//update ammo count
+  	$('#magazineProgress').progressBar('update', vars['ammocount']);
+  	//update dials
+  	if(mode==="auto")
+  		$('.dialView').val(vars['psmanposdegrees']).trigger('change');
+  	if(vars['psmanposdegrees'] !== $('.dial').val().substr(0, $(this).length))
+		$('.dial').val(vars['psmanposdegrees']).trigger('change');
+	switch(vars['pircurrentstate']){	
+		case '0':
+			updateMotion([0,0]);
+		break;
+		case '1':
+			updateMotion([1,0]);
+		break;
+		case '2':
+			updateMotion([0,1]);
+		break;
+		case '3':
+			updateMotion([1,1]);
+		break;
+	}
+	var changeable = ["vmautoduty", "vmmanduty", "pmoutdutysp"];
+	for (var i = changeable.length - 1; i >= 0; i--) {
+		$('.'+changeable[i]).html(vars[changeable[i]]);
+		if(!$('#settingsModal').is(":visible"))
+			$('#'+changeable[i]).val(vars[changeable[i]]);
+	};
+	$('.autoburst').val(autoburst);
+	$('.manualburst').val(manualburst);
+}
+
+function updateSettings(){
+	turretData["vmAutoDuty"] = $('input#vmautoduty').val();
+	turretData["vmManDuty"] = $('input#vmmanduty').val();
+	turretData["pmOutDutySP"] = $('input#pmoutdutysp').val();
+	autoburst = $('input#autoburst').val();
+	manualburst = $('input#manualburst').val();
+	$('#settingsModal').modal('hide');
+}
+
+function resetTurretData(){
+	$.each(turretData, function(key, data){
+		turretData[key] = "";
+	});
+}

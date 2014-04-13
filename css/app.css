@@ -5031,12 +5031,6 @@ body {
   width: auto !important;
   overflow-x: hidden !important; }
 
-.col-md-offset-1 {
-  margin-left: 3%; }
-
-#instantclick-bar {
-  background: #69bd7d; }
-
 [viewData] {
   cursor: pointer; }
 
@@ -5067,6 +5061,9 @@ button {
 
 .spinner {
   margin-top: 30%; }
+
+.row {
+  padding: 0 5px 0 5px; }
 
 #autoToggle, #manualToggle {
   float: right;
@@ -5136,7 +5133,8 @@ table#infraredArray, table#motionArray {
     width: 50px;
     height: 50px;
     border-spacing: 5px;
-    border-radius: 25px; }
+    border-radius: 25px;
+    border: 1px solid #a3a3a3; }
 
 td#m1, td#m2 {
   background-color: #a3a3a3; }

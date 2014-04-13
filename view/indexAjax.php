@@ -6,10 +6,10 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-md-5">
+  <div class="col-md-6">
     <div class="row">
       <div class="panel panel-default">
-        <div class="panel-heading">Sensor Status</div>
+        <div class="panel-heading"><i class="glyphicon glyphicon-dashboard"></i> Sensor Status</div>
         <div class="panel-body">
           Infrared:
           <table id="infraredArray">
@@ -30,24 +30,17 @@
               </tr>
             </tbody>
           </table>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <i class="glyphicon glyphicon-dashboard"></i> Turret Status
-        </div>
-        <div class="panel-body">
+          <br>
           Magazine capacity:
+          <br>
           <div class="progress">
             <div id="magazineProgress" class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="20" style="width: 100%">
               <span></span>
             </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
   <div class="row">
     <div class="panel panel-default logPanel" id="logPanel">
       <div class="panel-heading">Log: <span class="glyphicon glyphicon-chevron-down"></span></div>
@@ -56,7 +49,7 @@
     </div>
   </div>
 </div>
-<div class="col-md-6 col-md-offset-1">
+<div class="col-md-6">
   <div class="row">
     <div class="panel panel-default">
       <div class="panel-heading">
@@ -66,23 +59,25 @@
       </div>
       <div class="panel-body"> 
         <div id="autoControls" style="display:none"> 
-          <div id="knobContainer2" class="col-sm-4" style="display:none">
+          <div id="knobContainer2" class="col-sm-6" style="display:none">
             <label>Servo:</label>
             <input type="text" class="dialView" data-min="0" data-max="180">
           </div>
-          <div class="clearfix"></div>
-          <button id="startSweep" class="btn btn-danger" >Start Monitoring</button>
-          <button href="#" id="stopSweep" class="btn btn-warning" >Stop Monitoring</button>
+          <div class="col-sm-6">
+            <button id="startMon" class="btn btn-danger" >Start Monitoring</button>
+            <br><br>
+            <button href="#" id="stopMon" class="btn btn-warning" >Stop Monitoring</button>
+          </div>
         </div>
         <div id="manualControls">
           <br>
-          <div id="knobContainer" class="col-sm-4" style="display:none">
+          <div id="knobContainer" class="col-sm-6" style="display:none">
             <label>Servo:</label>
             <input type="text" class="dial" data-min="0" data-max="180">
           </div>
-          <div class="clearfix"></div>
-          <button class="btn btn-danger" id="shoot" >Shoot</button>
-          
+          <div class="col-sm-6">
+            <button class="btn btn-danger" id="shoot" >Shoot</button>
+          </div>
         </div>
       </div>
     </div>
@@ -93,7 +88,21 @@
         <span class="pull-right"><a href="#"  data-toggle="modal" data-target="#settingsModal" class="btn btn-default" >Edit</a></span>
       </div>
       <div class="list-group settingsContainer">
-        <?php //settings echoed here by settingsview. ?>
+        <a href='' class='list-group-item'>
+          <b>Auto Burst:</b> <span class='pull-right autoburst'></span>
+        </a>
+        <a href='' class='list-group-item'>
+          <b>Manual Burst:</b> <span class='pull-right manualburst'></span>
+        </a>
+        <a href='' class='list-group-item'>
+          <b>VM Auto Duty:</b> <span class='pull-right vmautoduty'></span>
+        </a>
+        <a href='' class='list-group-item'>
+          <b>VM Manual Duty:</b> <span class='pull-right vmmanduty'></span>
+        </a>
+        <a href='' class='list-group-item'>
+          <b>PM Duty:</b> <span class='pull-right pmoutdutysp'></span>
+        </a>
       </div>
     </div>
   </div>

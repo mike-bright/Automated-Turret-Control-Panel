@@ -10,20 +10,18 @@
         <div class="list-group">
           <form action="/settings/update" id="settingsForm">
             <div href="" class="form-group">
-              <label for="burst">Auto Burst:</label>
-              <input id="burst" name="burst" class="form-control" type="number" value="2">
-              <label for="burst">Man Burst:</label>
-              <input id="burst" name="burst" class="form-control" type="number" value="2">
+              <label for="autoburst">Auto Burst:</label>
+              <input class="autoburst" name="autoburst" class="form-control" type="number">
+              <label for="manual">Manual Burst:</label>
+              <input class="manual" name="manualburst" class="form-control" type="number">
+              <label for="vmautoduty">VM Auto Duty:</label>
+              <input class="vmautoduty" name="vmautoduty" class="form-control" type="number">
+              <label for="vmmanduty">VM Manual Duty:</label>
+              <input class="vmmanduty" name="vmmanduty" class="form-control" type="number">
             </div>
             <div href="" class="form-group">
-              <div class="half">
-                <label for="motion1">Motion Sensor 1:</label>
-                <input id="motion1" name="motion1" class="form-control switchery" type="checkbox">
-              </div>
-              <div class="half">
-                <label for="motion2">Motion Sensor 2:</label>
-                <input id="motion2" name="motion2" class="form-control switchery" type="checkbox">
-              </div>
+              <label for="pmoutdutysp">PM Duty:</label>
+              <input class="pmoutdutysp" name="pmoutdutysp" class="form-control" type="number">
             </div>
           </form>
         </div>
