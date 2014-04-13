@@ -7,3 +7,5 @@
 *.sublime-workspace
 
 .vagrant/machines/default/virtualbox/action_provision
+
+.vagrant/machines/default/virtualbox/action_provision

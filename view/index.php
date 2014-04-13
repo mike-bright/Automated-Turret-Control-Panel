@@ -12,10 +12,10 @@
 </script>
 <div class="container">
   <div class="row">
-    <div class="col-lg-2">
-      <?php require_once("menu.php"); ?>
-    </div>
-    <div id="mainContent" class="col-lg-10">
+      <?php //require_once("menu.php"); ?>
+  </div>
+  <div class="row">
+    <div id="mainContent" class="col-lg-12">
       <?php require_once('indexAjax.php'); ?>
     </div>
   </div>

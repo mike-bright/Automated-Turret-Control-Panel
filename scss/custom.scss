@@ -14,6 +14,10 @@ body {
   overflow-x: hidden !important;
 }
 
+.col-md-offset-1{
+  margin-left: 3%;
+}
+
 #instantclick-bar {
   background: $logo;
 }
@@ -46,6 +50,8 @@ dt[id$="-label"]{
   }
 }
 
+button {z-index:9999}
+
 .spacer {
   height: 20px;
 }
@@ -54,51 +60,21 @@ dt[id$="-label"]{
   margin-top: 30%;
 }
 
-////////////////
-//for sidebar:
-.nav-sidebar { 
-    width: 100%;
-    padding: 8px 0; 
-    border-right: 1px solid #ddd;
-}
-.nav-sidebar a {
-    color: #333;
-    -webkit-transition: all 0.08s linear;
-    -moz-transition: all 0.08s linear;
-    -o-transition: all 0.08s linear;
-    transition: all 0.08s linear;
-    -webkit-border-radius: 4px 0 0 4px; 
-    -moz-border-radius: 4px 0 0 4px; 
-    border-radius: 4px 0 0 4px; 
-}
-.nav-sidebar .active a { 
-    cursor: default;
-    background-color: #428bca; 
-    color: #fff; 
-    text-shadow: 1px 1px 1px #666; 
-}
-.nav-sidebar .active a:hover {
-    background-color: #428bca;   
-}
-.nav-sidebar .text-overflow a,
-.nav-sidebar .text-overflow .media-body {
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis; 
+
+#autoToggle, #manualToggle{
+  float: right;
+  margin-top: -7px;
 }
 
-/* Right-aligned sidebar */
-.nav-sidebar.pull-right { 
-    border-right: 0; 
-    border-left: 1px solid #ddd; 
+#connectingModal{
+  position: fixed;
+  top: 20%;
 }
-.nav-sidebar.pull-right a {
-    -webkit-border-radius: 0 4px 4px 0; 
-    -moz-border-radius: 0 4px 4px 0; 
-    border-radius: 0 4px 4px 0; 
+
+#settingsBody{
+  min-height: 35%;
 }
-//////end of sidebar//////
+
 
 #settingsModal{
 
@@ -122,12 +98,6 @@ dt[id$="-label"]{
   .checkboxLabel {
     width: 78%; //matches up with right edge of inputs
   }
-}
-
-.alert{
-  position: fixed;
-  width: 100%;
-  bottom: 0;
 }
 
 .half{
@@ -175,7 +145,7 @@ div.topbar{
   margin-bottom: -25px;
 }
 
-table.infraredArray {
+table#infraredArray, table#motionArray {
   margin:0 auto;
 
   tbody tr td {
@@ -184,6 +154,9 @@ table.infraredArray {
   border-spacing:5px;
   border-radius: 25px;
   }
+}
+td#m1, td#m2 {
+  background-color: $lightgrey;
 }
 
 div.debugPanel {
@@ -208,4 +181,14 @@ div.logPanel .panel-body{
   color: green;
   font-family: consolas;
   text-align: bottom;
+}
+
+div.panel-heading:hover{
+    background-color: rgb(224, 222, 222);
+    transition: background-color 1s ease;
+}
+
+div.panel-heading span.glyphicon-chevron-down{
+  float: right;
+  margin-top: 3px;
 }

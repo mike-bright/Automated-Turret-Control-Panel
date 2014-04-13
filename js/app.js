@@ -1,123 +1,34 @@
 ////global vars/////
-var stateObject,
-	lastPage = null,
-	spinner = "<img src='images/spiffygif.com.gif' class='center-block spinner' alt='Spinner'>",
+var defaultData = {"s1":"",
+					"s2":"",
+					"s3":"",
+					"s4":"",
+					"s5":"",
+					"s6":"",
+					"s7":"",
+					"s8":"",
+					"ammoCount":"",
+					"vmAutoDuty":"",
+					"vmManDuty":"",
+					"pmOutDutySP":"",
+					"psManPosDegrees":""
+					};
+var spinner = "<img src='images/spiffygif.com.gif' class='center-block spinner' alt='Spinner'>",
 	host = '127.0.0.1',
-	stopNow = false;
+	poller,
+	mode,
+	firstUpdate = true,
+	turretConnection,
+	turretData = defaultData,
+	disconnects = 1;
 
 $(document).ready(function() {
-	switch(currentPage){
-		case "Index":
-			indexInit();
-		break;
-		case "Debug":
-			debugInit();
-		break;
-	}
-	$('.debugTrigger').click(function(e) {
-		if(ajax){
-			e.preventDefault();
-			showDebug();
-		}
-		$(this).parent().addClass('active');
-	});
-
-	$('.homeTrigger').click(function(e) {
-		if(ajax){
-			e.preventDefault();
-			showIndex();
-		}
-	});
-	InstantClick.init();
+	indexInit();
 });
-//////////////////////////
-/////////END OF READY////
-////////////////////////
-
-
-////////////////////////////////////////////
-///////jquery method for progress bars//////
-////////////////////////////////////////////
-(function($){
-    var methods = {
-        init : function(options) {
-        	
-        },
-        min : function() {
-        	$(this).css('width', '0%');
-        	$(this).attr('aria-valuenow', $(this).attr('aria-valuemin'));
-        	$(this).find('span').text($(this).attr('aria-valuemin'));
-        },
-        max : function() {
-        	$(this).css('width', '100%');
-        	$(this).attr('aria-valuenow', $(this).attr('aria-valuemax'));
-        	$(this).find('span').text($(this).attr('aria-valuemax'));
-        },
-        decrement : function(value) {
-        	valueNow = $(this).attr('aria-valuenow');
-        	if(typeof value === "undefined") value = 1;
-        	if(valueNow === $(this).attr('aria-valuemin'))
-        		$.error("current at min, can't decrement!");
-        	newValue = valueNow - value;
-        	$(this).attr('aria-valuenow', newValue);
-        	$(this).find('span').text(newValue);
-        	$(this).css('width', Math.round(100*(newValue/$(this).attr('aria-valuemax')))+'%');
-        },
-        update : function(value) {
-        	if(value > $(this).attr('aria-valuemax') || value < $(this).attr('aria-valuemin'))
-        		$.error( 'value outside of progress bar\'s range!');
-        	$(this).css('width', Math.round(100*(value/$(this).attr('aria-valuemax')))+'%');
-        	$(this).attr('aria-valuenow', value);
-        	$(this).find('span').text(value);
-        }
-    }
-
-    $.fn.progressBar = function(methodOrOptions) {
-        if (methods[methodOrOptions]) {
-            return methods[ methodOrOptions ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-        } else if (typeof methodOrOptions === 'object' || !methodOrOptions) {
-            // Default to "init"
-            return methods.init.apply( this, arguments );
-        } else {
-            $.error( 'Method ' +  methodOrOptions + ' does not exist on jQuery.progressBar' );
-        }
-    }
-})(jQuery);
-//////shared functions///////
-
-
-
-
-function sweepDemo() {
-	var $magazine = $('#magazineProgress');
-	var $scanning = $('#scanningProgress');
-	updateInfrared(testArray);
-	$magazine.progressBar('max');
-	$scanning.progressBar('min');
-
-	(function sweepLoop(i) {
-	   setTimeout(function() {
-	      $scanning.progressBar('update', 10*i);
-	      if(i === 6){
-			updateInfrared(testArray2);
-	      	shootLoop($magazine.prop('aria-valuenow'));
-	      }
-	      i++;
-	      if (i<7) sweepLoop(i);
-	   }, 1000)
-	})(1);
-
-	function shootLoop(i) {
-		setTimeout(function() {
-			$magazine.progressBar('update', i);
-			if((--i)+1) shootLoop(i);
-		}, 500);
-	}
-}
 
 function updateInfrared(sensorData) {
 	var output = "";
-	var $table = $('table.infraredArray');
+	var $table = $('table#infraredArray');
 		output += "<tr>";
 	for(var i = 0; i < sensorData.length; i++) {
 		output += "<td magnitude='"+sensorData[i]+"'></td>";
@@ -125,9 +36,17 @@ function updateInfrared(sensorData) {
 		output += "</tr>";
 	$table.empty();
 	$table.html(output);
-	$('table.infraredArray tr td').each(function() {
-		var magnitude = Math.round(255-($(this).attr('magnitude')*255));
+	$('table#infraredArray tr td').each(function() {
+		//calculate "intensity" of red for sensor
+		var magnitude = Math.round(255-(($(this).attr('magnitude')/50)*255));
 		$(this).css('background-color', 'rgb(255, '+magnitude+', '+magnitude+')');
+	});
+}
+
+function updateMotion(sensorData) {
+	sensorData.each(function(key, value){
+		var color = (value)?'red':'#A3A3A3';
+		$('#s'+key).css('background-color');
 	});
 }
 
@@ -137,20 +56,10 @@ function fetchSettings(){
 		formData['servoAngle'] = servoAngle;
 	return formData;
 }
+
 function processSettings(){
 	var formData = fetchSettings();
-	updateSettings(formData);	//send settings to db
 	sendMessage(arrayToObject(formData));	//send settings to hw
-}
-
-function updateSettings(settingsArray){
-	$.post('/settings/update', settingsArray, function(data) {
-		eval('show'+currentPage)();
-		$('#settingsModal').find('[data-dismiss="modal"]').trigger('click');	//close modal
-		showSettings($('.settingsContainer'));	//update settings display
-		showSettingsForm($('#settingsForm'));	//update form data
-	});
-
 }
 
 //shows settings on index
@@ -168,16 +77,6 @@ function showSettings($container){
 function showSettingsForm($container){
 	$container.empty();
 	$container.html(spinner);
-
-	$.post('/settings/form', null, function(data) {
-		$container.empty();
-		$container.html(data);
-		var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
-		elems.forEach(function(html) {
-			var switchery = new Switchery(html);
-		});
-		$('.selectpicker').selectpicker();
-	});
 }
 
 //send array to hardware software on port 1337
@@ -188,7 +87,18 @@ function sendMessage(message, callback){
 	var response;
 	jQuery.isPlainObject(message);
 	$.post('/socket', message, function(data) {
-		setVars(xmlToObject(data));
+		if(data.length > 0 && data.indexOf("Warning") === -1){
+			disconnects = 0;
+			addToLog("Turret data updated");
+			// console.log(data);
+			setVars(xmlToObject(data));
+			return true;
+		} else {
+			disconnects++;
+			addToLog("<span style='color:red;'>Error</span> getting data!");
+			return false;
+		}
+
 		if(typeof callback !== "undefined")
 			callback();
 	});
@@ -218,53 +128,39 @@ function arrayToObject(arr) {
   return rv;
 }
 
-function setVars(varObject) {
-	console.log(varObject);
-	vars = varObject;
+function setVars(vars) {
+	// console.log(varObject);
+	//grab IR data
+	var sensorData = [vars['s1'],vars['s2'],vars['s3'],vars['s4'],
+					  vars['s5'],vars['s6'],vars['s7'],vars['s8'],];
+  	updateInfrared(sensorData);
+  	// updateMotion([vars['m1'], vars['m2']]);
+  	//update ammo count
+  	$('#magazineProgress').progressBar('update', vars['ammocount']);
+  	//update dials
+  	if(mode==="auto")
+  		$('.dialView').val(vars['psmanposdegrees']).trigger('change');
+  	if(vars['psmanposdegrees'] !== $('.dial').val().substr(0, $(this).length))
+		$('.dial').val(vars['psmanposdegrees']).trigger('change');
+
 }
 
 function startMonitoring(){
-	console.log("startMonitoring called!");
-	var message = fetchSettings();
-	message['close'] = false;
-	sendMessage(message, returnMonitoring);
-}
-
-function returnMonitoring(){
-	if(stopNow){
-		stopNow = false;
-		console.log("stopping");
-	}
-	else
-		startMonitoring();
+	turretData['auto_man'] = 1;
 }
 
 function stopMonitoring(){
-	stopNow = true;
+	turretData['auto_man'] = 0;
 }
 
-////////////////////////////////
-////////INDEX FUNCTIONS/////////
-////////////////////////////////
-
-var showIndex = function(){
-	var $mainContent = $('#mainContent');
-	$mainContent.empty();
-	$mainContent.html(spinner);
-	$.post('/', function(data){
-		$mainContent.empty();
-		$mainContent.html(data);
-		//manipulate URL
-		history.pushState(stateObject, "Automated Turret", '/');
-		lastPage = currentPage;
-		currentPage = "Index";
-		indexInit();
-	});
-}
 
 var indexInit = function() {
+
+	//hide auto controls
+	modeToggleInit();
+
 	showSettings($('.settingsContainer'));
-	showSettingsForm($('#settingsForm'));
+	// showSettingsForm($('#settingsForm'));
 	$('.homeTrigger').parent().addClass('active');
 	$('.debugTrigger').parent().removeClass('active');
 
@@ -285,64 +181,7 @@ var indexInit = function() {
 	$('#settingsModal').on('show.bs.modal', function() {
 		$('[data-toggle="modal"]').parent().addClass('active');
 	});
-
-
-	testArray = ['.05', '.1', '.1', '.1', '.2', '.2', '.1', '.1'];
-	testArray2 = ['.2', '.25', '.5', '.7', '.9', '.8', '.5', '.3'];
-	updateInfrared(testArray);
-
-	new Switchery($('.js-switch'));
-};
-
-
-
-
-////////////////////////////////////////////////
-/////////////DEBUG FUNCTIONS////////////////////
-////////////////////////////////////////////////
-
-
-var showDebug = function() {
-	var $mainContent = $('#mainContent');
-	$mainContent.empty();
-	$mainContent.html(spinner);
-	$.post('/debug', function(data){
-		//empty main container
-		$mainContent.empty();
-		//fill with debug content
-		$mainContent.html(data);
-		//manipulate url
-		history.pushState(stateObject, "Automated Turret - Debug", '/debug');
-		lastPage = currentPage;
-		currentPage = "Debug";
-		debugInit();
-	});
-}
-
-var debugInit = function() {
-	showSettings($('.settingsContainer'));
-	showSettingsForm($('#settingsForm'));
-	$('.homeTrigger').parent().removeClass('active');
-	$('.debugTrigger').parent().addClass('active');
-
-	$('#settingsModal').on('hide.bs.modal', function() {
-		$('#settingsButton').removeClass('active');
-	});
-	$('#settingsModal').on('show.bs.modal', function() {
-		$('#settingsButton').addClass('active');
-	});
-	//settings modal functions
-	$('#settingsModal').on('hide.bs.modal', function() {
-		$('[data-toggle="modal"]').parent().removeClass('active');
-	});
-	$('#settingsModal').on('show.bs.modal', function() {
-		$('[data-toggle="modal"]').parent().addClass('active');
-	});
-
-	//switches in settings modal
-	new Switchery($('.js-switch'));
-
-	//knob settings/update function
+	//manual mode knob
 	$('.dial').knob({
 		'min': 0,
 		'max': 180,
@@ -356,26 +195,136 @@ var debugInit = function() {
 	  		updateServo(v);
 	  	}
 	});
+	//auto mode knob
+	$('.dialView').knob({
+		'min': 0,
+		'max': 180,
+		'angleArc': 180,
+		'angleOffset': 270,
+		'fgColor': "#69bd7d",
+		'readOnly': true,
+		'draw' : function() {
+			$(this.i).val(this.cv + '°');
+	  	}
+	});
+	//show knob after init
+	$('#knobContainer, #knobContainer2').show();
+
+	//shoot button
 	$('#shoot').click(function(){
-		$('#magazineProgress').progressBar('decrement');
-		addToLog("shot fired");
-	});
-	$('#refresh').click(function(){	//this won't be necessary, I think
-		$('#magazineProgress').progressBar('max');
-		addToLog("refreshing status");
-		addToLog("ammo at max");
+		turretData['shotRequest'] = 1;
+		addToLog("Shot request sent");
 	});
 
-	function addToLog(message) {
-		var $logContainer = $('div.logPanel .panel-body');
-		var height = $logContainer.prop('scrollHeight');
-		$logContainer.append('<br>'+message);
-		$logContainer.animate({scrollTop: height}, 100);
-	}
+	//make the log minimizable
+	$('#logPanel div.panel-heading').click(function() {
+		$('#logPanel div.panel-body').slideToggle("fast");
+	});
 
-	function updateServo(angle) {
-		servoAngle = angle;
-		updateSettings();
-		addToLog("servo updated to "+angle+" degrees");
+
+	connectToTurret();
+};
+
+function updateServo(angle) {
+	turretData['psManPosDegrees'] = angle
+	addToLog("Servo updated to "+angle+" degrees");
+}
+
+function addToLog(message) {
+	var $logContainer = $('div.logPanel .panel-body');
+	var height = $logContainer.prop('scrollHeight');
+	$logContainer.append('<br>'+message);
+	$logContainer.animate({scrollTop: height}, 100);
+}
+
+function modeToggleInit() {
+	var $autoToggle = $('#autoToggle'),
+		$manualToggle = $('#manualToggle'),
+		$manualControls = $('#manualControls'),
+		$autoControls = $('#autoControls');
+
+	$autoToggle.click(function() {
+		//send message to change to manual mode
+		$(this).hide();
+		$manualToggle.show();
+		mode = "manual";
+		addToLog("Now in manual mode");
+		$autoControls.hide();
+		$manualControls.show();
+	});
+	$manualToggle.click(function() {
+		//send message to change to auto mode
+		$(this).hide();
+		$autoToggle.show();
+		mode = "auto";
+		addToLog("Now in auto mode");
+		$manualControls.hide();
+		$autoControls.show();
+		//verify turret is in right mode
+		turretData['auto_man'] = 0;
+	});
+}
+
+function connectToTurret() {
+	//try to connect
+	var $connectingModal = $('#connectingModal');
+	if(disconnects > 0){
+		console.log("waiting");
+		$connectingModal.modal();
+		//try to create connection every three seconds
+		setTimeout(function(){
+			sendMessage(defaultData, connectToTurret());
+		}, 3000);
+	}else{
+		console.log("done waiting");
+		//connection made!
+		$connectingModal.modal('hide');
+		// Init poller
+		pingTurret();
 	}
 }
+
+function pingTurret(imBack){
+	if(disconnects > 5){
+		//uh oh, display connecting to turret modal
+		connectToTurret();
+	} else if(typeof imBack === "undefined"){
+		setTimeout(function(){
+			sendMessage(turretData, pingTurret(true));
+		}, 1000);
+	} else {
+		//reset data
+		turretData = defaultData;
+		pingTurret();
+	}
+}
+
+
+
+//////shared functions///////
+// function sweepDemo() {
+// 	var $magazine = $('#magazineProgress');
+// 	var $scanning = $('#scanningProgress');
+// 	updateInfrared(testArray);
+// 	$magazine.progressBar('max');
+// 	$scanning.progressBar('min');
+
+// 	(function sweepLoop(i) {
+// 	   setTimeout(function() {
+// 	      $scanning.progressBar('update', 10*i);
+// 	      if(i === 6){
+// 			updateInfrared(testArray2);
+// 	      	shootLoop($magazine.prop('aria-valuenow'));
+// 	      }
+// 	      i++;
+// 	      if (i<7) sweepLoop(i);
+// 	   }, 1000)
+// 	})(1);
+
+// 	function shootLoop(i) {
+// 		setTimeout(function() {
+// 			$magazine.progressBar('update', i);
+// 			if((--i)+1) shootLoop(i);
+// 		}, 500);
+// 	}
+// }

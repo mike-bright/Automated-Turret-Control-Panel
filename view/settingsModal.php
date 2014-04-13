@@ -5,35 +5,24 @@
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       <h4 class="modal-title"><i class="glyphicon glyphicon-wrench"></i> Settings</h4>
     </div>
-    <div class="modal-body">
-      <div class="panel panel-default">
+    <div class="modal-body" id="settingsBody">
+      <div class="panel">
         <div class="list-group">
           <form action="/settings/update" id="settingsForm">
-            <div href="" class="form-group list-group-item">
-              <label for="mode">Mode:</label>
-              <select id="mode" name="mode" class="form-control" data-no-instant>
-                <option value="nothing">Do nothing</option>
-                <option value="fire" selected>Fire at will</option>
-                <option value="alarm">Alarm</option>
-                <option value="firealarm">Fire at will w/ alarm</option>
-              </select>
+            <div href="" class="form-group">
+              <label for="burst">Auto Burst:</label>
+              <input id="burst" name="burst" class="form-control" type="number" value="2">
+              <label for="burst">Man Burst:</label>
+              <input id="burst" name="burst" class="form-control" type="number" value="2">
             </div>
-            <div href="" class="form-group list-group-item">
-              <label for="magazineSize">Magazine size:</label>
-              <input id="magazineSize" name="magazineSize" class="form-control" type="number" value="16">
-            </div>
-            <div href="" class="form-group list-group-item">
-              <label for="sweepRange">Sweep Range:</label>
-              <input id="sweepRange" name="sweepRange" class="form-control" type="number" value="180">
-            </div>
-            <div href="" class="form-group list-group-item">
+            <div href="" class="form-group">
               <div class="half">
-                <label for="motionDetection">Motion Detection:</label>
-                <input id="motionDetection" name="motionDetection" class="form-control" type="checkbox">
+                <label for="motion1">Motion Sensor 1:</label>
+                <input id="motion1" name="motion1" class="form-control switchery" type="checkbox">
               </div>
               <div class="half">
-                <label for="alarm">Alarm:</label>
-                <input id="alarm" name="alarm" class="form-control" type="checkbox">
+                <label for="motion2">Motion Sensor 2:</label>
+                <input id="motion2" name="motion2" class="form-control switchery" type="checkbox">
               </div>
             </div>
           </form>
