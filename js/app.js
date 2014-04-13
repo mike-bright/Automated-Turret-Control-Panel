@@ -11,7 +11,8 @@ var defaultData = {"s1":"",
 					"vmAutoDuty":"",
 					"vmManDuty":"",
 					"pmOutDutySP":"",
-					"psManPosDegrees":""
+					"psManPosDegrees":"",
+					"pirCurrentState":""
 					};
 var spinner = "<img src='images/spiffygif.com.gif' class='center-block spinner' alt='Spinner'>",
 	host = '127.0.0.1',
@@ -52,31 +53,12 @@ function updateMotion(sensorData) {
 
 function fetchSettings(){
 	formData = $('#settingsForm').serialize();
-	if($('.dial').length)  //grab angle, if set
-		formData['servoAngle'] = servoAngle;
 	return formData;
 }
 
 function processSettings(){
 	var formData = fetchSettings();
 	sendMessage(arrayToObject(formData));	//send settings to hw
-}
-
-//shows settings on index
-function showSettings($container){
-	$container.empty();
-	$container.html(spinner);
-
-	$.post('/settings/get', null, function(data) {
-		$container.empty();
-		$container.html(data);
-	});
-}
-
-//generates hidden settings modal
-function showSettingsForm($container){
-	$container.empty();
-	$container.html(spinner);
 }
 
 //send array to hardware software on port 1337
@@ -142,6 +124,20 @@ function setVars(vars) {
   		$('.dialView').val(vars['psmanposdegrees']).trigger('change');
   	if(vars['psmanposdegrees'] !== $('.dial').val().substr(0, $(this).length))
 		$('.dial').val(vars['psmanposdegrees']).trigger('change');
+	switch(vars['pircurrentstate']){
+		case 0:
+			updateMotion([0,0]);
+		break;
+		case 1:
+			updateMotion([1,0]);
+		break;
+		case 2:
+			updateMotion([0,1]);
+		break;
+		case 3:
+			updateMotion([1,1]);
+		break;
+	}
 
 }
 
@@ -159,8 +155,6 @@ var indexInit = function() {
 	//hide auto controls
 	modeToggleInit();
 
-	showSettings($('.settingsContainer'));
-	// showSettingsForm($('#settingsForm'));
 	$('.homeTrigger').parent().addClass('active');
 	$('.debugTrigger').parent().removeClass('active');
 
