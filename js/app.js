@@ -1,3 +1,4 @@
+////////////////////
 ////global vars/////
 var initialData = { "s1":"",
 					"s2":"",
@@ -22,6 +23,8 @@ var spinner = "<img src='images/spiffygif.com.gif' class='center-block spinner' 
 	disconnects = 1,
 	autoburst = 1,
 	manualburst = 1;
+///end of global vars///
+///////////////////////
 
 $(document).ready(function(){indexInit()});
 
@@ -37,7 +40,7 @@ function updateInfrared(sensorData) {
 	$table.html(output);
 	$('table#infraredArray tr td').each(function() {
 		//calculate "intensity" of red for sensor
-		var magnitude = Math.round(255-(($(this).attr('magnitude')-25)*255));
+		var magnitude = Math.round(255-((($(this).attr('magnitude')-28)/10)*255));
 		$(this).css('background-color', 'rgb(255, '+magnitude+', '+magnitude+')');
 	});
 }
@@ -49,48 +52,10 @@ function updateMotion(sensorData) {
 	};
 }
 
-function fetchSettings(){
-	formData = $('#settingsForm').serialize();
-	return formData;
-}
-
-function processSettings(){
-	var formData = fetchSettings();
-	sendMessage(arrayToObject(formData));	//send settings to hw
-}
-
-function startMonitoring(){
-	turretData['auto_man'] = 1;
-}
-
-function stopMonitoring(){
-	turretData['auto_man'] = 0;
-}
-
 var indexInit = function() {
 	//hide auto controls
 	modeToggleInit();
 
-	$('.homeTrigger').parent().addClass('active');
-	$('.debugTrigger').parent().removeClass('active');
-
-	$('[viewData]').click(function() {
-		window.location.href = $(this).attr('viewData');
-	});
-
-	$('table.infraredArray tr td').each(function() {
-		var magnitude = Math.round(255-($(this).attr('magnitude')*255));
-		$(this).css('background-color', 'rgb(255, '+magnitude+', '+magnitude+')');
-	});
-	$('#startSweep').click(function() {
-		sweepDemo();
-	});
-	$('#settingsModal').on('hide.bs.modal', function() {
-		$('[data-toggle="modal"]').parent().removeClass('active');
-	});
-	$('#settingsModal').on('show.bs.modal', function() {
-		$('[data-toggle="modal"]').parent().addClass('active');
-	});
 	//manual mode knob
 	$('.dial').knob({
 		'min': 0,
@@ -201,64 +166,61 @@ function connectToTurret() {
 
 function pingTurret(){
 	if(disconnects > 5){
-		//uh oh, display connecting to turret modal
+		// haven't seen it in a second, restart connecting process
 		connectToTurret();
 	} else if(typeof imBack === "undefined"){
 		setTimeout(function(){
 			sendMessage(turretData, pingTurret);
 		}, 200);
 	} else {
-		//reset data
-		
 		pingTurret();
 	}
 }
 
-//send array to hardware software on port 1337
-//returns response
 function sendMessage(message, callback){
-	var xmlString = objectToXml(message);
-	var message = {'host':host, 'message':xmlString};
-	var response;
-	jQuery.isPlainObject(message);
+	var xmlString = objectToXml(message);	//convert obj. to xml string
+	var message = {'host':host, 'message':xmlString};	//format for php
+	resetTurretData();	//clear out data
+	// jQuery.isPlainObject(message); not sure if needed
 	$.post('/socket', message, function(data) {
-		resetTurretData();
+		//verify valid message received
 		if(data.length > 0 && data.indexOf("Warning") === -1){
-			disconnects = 0;
+			disconnects = 0;	//reset disconnect count
 			addToLog("Turret data updated");
-			setVars(xmlToObject(data));
+			setVars(xmlToObject(data));	//update UI variables/displays
 			return true;
 		} else {
-			disconnects++;
+			disconnects++;	//uh oh, increment disconnects
 			addToLog("<span style='color:red;'>Error</span> getting data!");
 			return false;
 		}
 	});
-	callback();
+	callback();	//call callback function
 }
 
 function xmlToObject(xml){
 	var arrayResponse = {};
-	$(xml).find("*").each(function(){
+	$(xml).find("*").each(function(){	//add each xml element to object
 		arrayResponse[$(this).context.localName] = $(this).text();
 	});
 	return arrayResponse;
 }
 
 function objectToXml(arrayXml){
+	//add valid header/root tag
 	var returnString = '<?xml version="1.0" encoding="UTF-8"?>\
 						<turretSettings>';
-	for(var key in arrayXml){
+	for(var key in arrayXml){	//add tag/value for each key/value
 		returnString = returnString + "<" + key + ">" + arrayXml[key] + "</" + key + ">";
 	};
 	return returnString+'</turretSettings>';
 }
 
-function arrayToObject(arr) {
-  var rv = {};
-  for (var i = 0; i < arr.length; ++i)
-    if (arr[i] !== undefined) rv[i] = arr[i];
-  return rv;
+function arrayToObject(inArr) {
+  var retObj = {};
+  for (var i = 0; i < inArr.length; ++i)
+    if (inArr[i] !== undefined) retObj[i] = inArr[i];
+  return retObj;
 }
 
 function setVars(vars) {
@@ -266,14 +228,14 @@ function setVars(vars) {
 	var sensorData = [vars['s1'],vars['s2'],vars['s3'],vars['s4'],
 					  vars['s5'],vars['s6'],vars['s7'],vars['s8'],];
   	updateInfrared(sensorData);
-  	// updateMotion([vars['m1'], vars['m2']]);
   	//update ammo count
   	$('#magazineProgress').progressBar('update', vars['ammocount']);
   	//update dials
-  	if(mode==="auto")
+  	// if(mode==="auto")
   		$('.dialView').val(vars['psmanposdegrees']).trigger('change');
   	if(vars['psmanposdegrees'] !== $('.dial').val().substr(0, $(this).length))
 		$('.dial').val(vars['psmanposdegrees']).trigger('change');
+	//update motion sensor display
 	switch(vars['pircurrentstate']){	
 		case '0':
 			updateMotion([0,0]);
@@ -302,10 +264,13 @@ function updateSettings(){
 	turretData["pmOutDutySP"] = $('input#pmoutdutysp').val();
 	autoburst = $('input#autoburst').val();
 	manualburst = $('input#manualburst').val();
+	$('.autoburst').html(autoburst);
+	$('.manualburst').html(manualburst);
 	$('#settingsModal').modal('hide');
 }
 
 function resetTurretData(){
+	//set all keys to empty strings
 	$.each(turretData, function(key, data){
 		turretData[key] = "";
 	});
