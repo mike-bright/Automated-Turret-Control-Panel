@@ -17,10 +17,7 @@ var initialData = { "s1":"",
 				  };
 var spinner = "<img src='images/spiffygif.com.gif' class='center-block spinner' alt='Spinner'>",
 	host = '127.0.0.1',
-	poller,
 	mode,
-	firstUpdate = true,
-	turretConnection,
 	turretData = initialData,
 	disconnects = 1,
 	autoburst = 1,
@@ -62,8 +59,6 @@ function processSettings(){
 	sendMessage(arrayToObject(formData));	//send settings to hw
 }
 
-
-
 function startMonitoring(){
 	turretData['auto_man'] = 1;
 }
@@ -72,9 +67,7 @@ function stopMonitoring(){
 	turretData['auto_man'] = 0;
 }
 
-
 var indexInit = function() {
-
 	//hide auto controls
 	modeToggleInit();
 
