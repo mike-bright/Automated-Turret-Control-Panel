@@ -139,8 +139,10 @@ var indexInit = function() {
 		$('#logPanel div.panel-body').slideToggle("fast");
 	});
 
-	$('.autoburst').val(autoburst);
-	$('.manualburst').val(manualburst);
+	$('.autoburst').html(autoburst);
+	$('.manualburst').html(manualburst);
+	$('input#autoburst').val(autoburst);
+	$('input#manualburst').val(manualburst);
 
 	connectToTurret();
 };
@@ -299,8 +301,6 @@ function setVars(vars) {
 		if(!$('#settingsModal').is(":visible"))
 			$('#'+changeable[i]).val(vars[changeable[i]]);
 	};
-	$('.autoburst').val(autoburst);
-	$('.manualburst').val(manualburst);
 }
 
 function updateSettings(){

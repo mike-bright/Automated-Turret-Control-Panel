@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
    <turretSettings> <!-- Root element required per XML standard -->
       <auto_man>0</auto_man> <!-- changed when user goes to main/debug pages -->
-      <magCapacity>0</magCapacity> <!-- Set when settings changed -->
-      <processRun>1</processRun> <!-- Blank set on page load, 1 sent if 0 returned -->
       <shotRequest>1</shotRequest> <!-- Sent on button click in debug page -->
       <autoBurstSize>5</autoBurstSize> <!-- Set when settings changed -->
       <manBurstSize>2</manBurstSize> <!-- Set when settings changed -->
       <vmAutoDuty>50</vmAutoDuty> <!-- Set when settings changed -->
       <vmManDuty>50</vmManDuty> <!-- Set when settings changed -->
       <pmOutDutySP>50</pmOutDutySP> <!-- Set when settings changed -->
-      <psManPosDegrees>0</psManPosDegrees> <!-- Set from debug knob -->
-      <ammoCount>20</ammoCount> <!-- Set when settings changed -->
-      <pirCurrentState>3</pirCurrentState> <!-- Set when settings changed -->
+      <psManPosDegrees></psManPosDegrees> <!-- Set from debug knob -->
+      <ammoCount></ammoCount>
       <thermalArray> <!-- Sent every request, alway empty -->
          <s1></s1>
          <s2></s2>

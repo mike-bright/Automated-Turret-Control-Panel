@@ -11,17 +11,17 @@
           <form action="/settings/update" id="settingsForm">
             <div href="" class="form-group">
               <label for="autoburst">Auto Burst:</label>
-              <input class="autoburst" name="autoburst" class="form-control" type="number">
-              <label for="manual">Manual Burst:</label>
-              <input class="manual" name="manualburst" class="form-control" type="number">
+              <input id="autoburst" name="autoburst" class="form-control" type="number">
+              <label for="manualburst">Manual Burst:</label>
+              <input id="manualburst" name="manualburst" class="form-control" type="number">
               <label for="vmautoduty">VM Auto Duty:</label>
-              <input class="vmautoduty" name="vmautoduty" class="form-control" type="number">
+              <input id="vmautoduty" name="vmautoduty" class="form-control" type="number">
               <label for="vmmanduty">VM Manual Duty:</label>
-              <input class="vmmanduty" name="vmmanduty" class="form-control" type="number">
+              <input id="vmmanduty" name="vmmanduty" class="form-control" type="number">
             </div>
             <div href="" class="form-group">
               <label for="pmoutdutysp">PM Duty:</label>
-              <input class="pmoutdutysp" name="pmoutdutysp" class="form-control" type="number">
+              <input id="pmoutdutysp" name="pmoutdutysp" class="form-control" type="number">
             </div>
           </form>
         </div>
