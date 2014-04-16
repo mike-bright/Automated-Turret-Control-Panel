@@ -16,7 +16,7 @@
   </div>
   <div class="row">
     <div id="mainContent" class="col-lg-12">
-      <?php require_once('indexAjax.php'); ?>
+      <?php require_once('indexBody.php'); ?>
     </div>
   </div>
 </div>
