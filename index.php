@@ -13,12 +13,5 @@ foreach (glob("handlers/*.php") as $filename)
 
 Toro::serve(array(
     "/" => "IndexHandler",
-    "/log/:alpha" => "LogHandler",
-    "/settings" => "SettingsHandler",
-    "/settings/update" => "SettingsUpdateHandler",
-    "/settings/get" => "SettingsGetHandler",
-    "/settings/form" => "SettingsFormHandler",
-    "/debug" => "DebugHandler",
-    "/exec/:alpha" => "ExecHandler",
     "/socket" => "SocketHandler"
 ));
