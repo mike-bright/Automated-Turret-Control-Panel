@@ -59,14 +59,10 @@
       </div>
       <div class="panel-body"> 
         <div id="autoControls" style="display:none"> 
-          <div id="knobContainer2" class="col-sm-6" style="display:none">
-            <label>Servo:</label>
-            <input type="text" class="dialView" data-min="0" data-max="180">
-          </div>
           <div class="col-sm-6">
             <button id="startMon" class="btn btn-danger" >Start Monitoring</button>
             <br><br>
-            <button href="#" id="stopMon" class="btn btn-warning" >Stop Monitoring</button>
+            <button href="#" id="stopMon" class="btn btn-warning" disabled>Stop Monitoring</button>
           </div>
         </div>
         <div id="manualControls">
